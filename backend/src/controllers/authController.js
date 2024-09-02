@@ -11,11 +11,19 @@ exports.register = async (req, res) => {
     const { username, email, password } = req.body;
 
     try {
-        let user = await User.findOne({ email });
+        // Check if the username already exists
+        let user = await User.findOne({ username });
         if (user) {
-            return res.status(400).json({ msg: 'User already exists' });
+            return res.status(400).json({ msg: 'Username already exists' });
         }
 
+        // Check if the email already exists
+        user = await User.findOne({ email });
+        if (user) {
+            return res.status(400).json({ msg: 'Email already exists' });
+        }
+
+        // Create and save the new user
         user = new User({ username, email, password });
         await user.save();
 
@@ -30,10 +38,12 @@ exports.register = async (req, res) => {
             res.json({ token });
         });
     } catch (err) {
-        console.error(err.message);
+        console.error('Server Error:', err);
         res.status(500).send('Server error');
     }
 };
+
+console.log(process.env.JWT_SECRET);
 
 exports.login = async (req, res) => {
     const errors = validationResult(req);
