@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Modal from 'react-modal';
+import axios from 'axios'; // Import axios for making HTTP requests
 
 Modal.setAppElement('#root');
 
@@ -7,11 +8,21 @@ const CreatePoolModal = ({ isOpen, onRequestClose }) => {
     const [leagueId, setLeagueId] = useState('');
     const [betAmount, setBetAmount] = useState(1);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Call the function to interact with the Sleeper API using the provided league ID and bet amount
-        console.log('Creating pool with:', leagueId, betAmount);
-        onRequestClose(); // Close the modal after submission
+        try {
+            // Make a POST request to your backend API to create the pool
+            const response = await axios.post('/api/v1/pools/create', {
+                leagueId,
+                betAmount
+            });
+            console.log('Pool created successfully:', response.data);
+            // Optionally, handle the response or show a success message
+            onRequestClose(); // Close the modal after successful submission
+        } catch (error) {
+            console.error('Error creating pool:', error);
+            // Optionally, handle the error (e.g., show an error message to the user)
+        }
     };
 
     return (
@@ -19,8 +30,8 @@ const CreatePoolModal = ({ isOpen, onRequestClose }) => {
             isOpen={isOpen}
             onRequestClose={onRequestClose}
             contentLabel="Create Pool"
-            className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto mt-20" // Tailwind classes for styling the modal
-            overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center" // Overlay styling
+            className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto mt-20"
+            overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
         >
             <h2 className="text-2xl font-bold mb-6 text-gray-800">Create a New Pool</h2>
             <form onSubmit={handleSubmit}>
@@ -70,4 +81,5 @@ const CreatePoolModal = ({ isOpen, onRequestClose }) => {
 };
 
 export default CreatePoolModal;
+
 
